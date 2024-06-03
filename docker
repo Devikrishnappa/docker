@@ -1,0 +1,196 @@
+EXP:6 Docker Volume
+ 
+yum install docker
+systemctl start docker
+docker pull nginx
+docker volume create my_volume
+“docker run -d --name my_nginx -v my_volume:/usr/share/nginx/html -p 80:80 nginx”
+“docker inpect my_nginx”
+
+
+EXP 9 ECS
+nginxdemo
+nginxdemo   nginxdemos/hello   
+
+
+
+EXP 7: Docker Compose
+
+yum install docker
+systemctl start docker
+sudo chmod +x /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.7/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+nano docker-compose.yml
+
+//code to upload in docker compose file
+version: '3.8'
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+
+  database:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - backend
+
+  cache:
+    image: redis:latest
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
+
+
+ctrl o ,enter, control x
+docker-compose up -d
+docker-compose up -d --scale cache=3
+
+
+Cloud 9 TDD
+
+wget https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
+wget https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+mkdir -p src test
+cd src
+touch Calculator.java
+cd ..
+cd test
+touch CalculatorTest.java
+cd ..
+javac -cp .:junit-4.13.2.jar:hamcrest-core-1.3.jar src/Calculator.java test/CalculatorTest.java
+
+java -cp .:src:test:junit-4.13.2.jar:hamcrest-core-1.3.jar org.junit.runner.JUnitCore CalculatorTest    or    
+
+java -cp .:src:test:junit-4.13.2.jar:hamcrest-core-1.3.jar org.junit.runner.JUnitCore CalculatorTest
+
+
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    public int sub(int a, int b) {
+        return a - b;
+    }
+
+    public int multiply(int a, int b) {
+        return a * b;
+    }
+
+    public double divide(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("Division by zero is not allowed.");
+        }
+        return (double) a / b;
+    }
+}
+
+
+
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+public class CalculatorTest {
+
+    @Test
+    public void testAddPositive() {
+        Calculator calculator = new Calculator();
+        assertEquals(5, calculator.add(2, 3));
+    }
+
+    @Test
+    public void testAddNegative() {
+        Calculator calculator = new Calculator();
+        assertEquals(-5, calculator.add(-2, -3));
+    }
+
+    @Test
+    public void testAddMixed() {
+        Calculator calculator = new Calculator();
+        assertEquals(1, calculator.add(2, -1));
+    }
+
+    @Test
+    public void testSubPositive() {
+        Calculator calculator = new Calculator();
+        assertEquals(2, calculator.sub(5, 3));
+    }
+
+    @Test
+    public void testSubNegative() {
+        Calculator calculator = new Calculator();
+        assertEquals(1, calculator.sub(-2, -3));
+    }
+
+    @Test
+    public void testSubMixed() {
+        Calculator calculator = new Calculator();
+        assertEquals(3, calculator.sub(2, -1));
+    }
+
+    @Test
+    public void testMultiplyPositive() {
+        Calculator calculator = new Calculator();
+        assertEquals(6, calculator.multiply(2, 3));
+    }
+
+    @Test
+    public void testMultiplyNegative() {
+        Calculator calculator = new Calculator();
+        assertEquals(6, calculator.multiply(-2, -3));
+    }
+
+    @Test
+    public void testMultiplyMixed() {
+        Calculator calculator = new Calculator();
+        assertEquals(-6, calculator.multiply(2, -3));
+    }
+
+    @Test
+    public void testDividePositive() {
+        Calculator calculator = new Calculator();
+        assertEquals(2.0, calculator.divide(6, 3), 0.0001);
+    }
+
+    @Test
+    public void testDivideNegative() {
+        Calculator calculator = new Calculator();
+        assertEquals(2.0, calculator.divide(-6, -3), 0.0001);
+    }
+
+    @Test
+    public void testDivideMixed() {
+        Calculator calculator = new Calculator();
+        assertEquals(-2.0, calculator.divide(6, -3), 0.0001);
+    }
+
+    @Test
+    public void testDivideByZero() {
+        Calculator calculator = new Calculator();
+        assertThrows(ArithmeticException.class, () -> {
+            calculator.divide(6, 0);
+        });
+    }
+}
+
+
+
+
